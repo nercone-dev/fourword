@@ -42,7 +42,7 @@ The default bit size is 256.
 
 The total number of bits must be divisible by 32.
 
-## CLI Tool
+### CLI Tool
 There is a CLI tool that I had an AI create.
 It hasn't been tested thoroughly, but it should work.
 
