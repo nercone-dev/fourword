@@ -1,24 +1,22 @@
 # FourWord
 
-## 概要
-新しいランダム識別子の生成方式です。
+## Overview
+A new generation method for random identifiers.
 
-先頭にタイムスタンプがあり、テキスト化では文字セットとしてBase32 Hexを使用しているので、時系列順でのソートが可能です。
-パディングには`=`の代わりに`Z`を使用しているため、英数字を使える場所であれば使用できるはずです。
+It includes a timestamp at the beginning and uses Base32 Hex as the character set for text representation, allowing for sorting in chronological order.
+Since 'Z' is used instead of '=' for padding, it should be usable in any environment that supports alphanumeric characters.
 
-できる限り衝突の可能性を低くしつつオーバーフローも防ぐために、タイムスタンプは固定にせず生成するビット数の1/4を占めるようにしています。
-これによりビット数を多くするだけで、より長く継続して使用できます。
-ただし代わりに、タイムスタンプ部分の先頭に無駄な連続した0の部分が発生します。
+To minimize the possibility of collisions while preventing overflow, the timestamp is not fixed; instead, it occupies 1/4 of the total bits generated.
+This allows for longer continuous use simply by increasing the total number of bits.
+However, as a trade-off, unnecessary leading zeros will appear at the beginning of the timestamp portion.
 
-データベースなどで利用することを想定しています。
+It is intended for use in databases and similar applications.
 
-## 語源
-Fourの部分は、タイムスタンプがビット数の1/4を占めることからです。
-それをForwardと掛けています。
+## Etymology
+The "Four" part comes from the fact that the timestamp occupies 1/4 of the total bits.
+It is also a play on the word "Forward."
 
-~~全体のビット数はね、うーん...これくらい。タイムスタンプが、4個分くらいかな~~
-
-## Pythonライブラリ
+## Python Library
 ```
 from fourword.lib import FourWord
 
@@ -26,64 +24,64 @@ fourword = FourWord(bits=256)
 print(fourword.text)
 ```
 
-Pythonではfourwordライブラリを使用してFourWordを生成できます。
-fourwordライブラリは外部ライブラリなしで動作します。
+In Python, you can generate FourWord using the fourword library.
+The fourword library works without any external dependencies.
 
-デフォルトのビット数は256です。
+The default bit size is 256.
 
-全体のビット数は32で割り切れる必要があります。
+The total number of bits must be divisible by 32.
 
-## CLIツール
-AIに適当に作らせたCLIツールならあります。
-あまりちゃんとテストしていませんが多分動きます。
+## CLI Tool
+There is a CLI tool that I had an AI create.
+It hasn't been tested thoroughly, but it should work.
 
-ライブラリをそのままインストールすると`fourword-py`コマンドで使えるようになるはずです。
+Once the library is installed, you should be able to use the `fourword-py` command.
 
-## 仕様
-FourWordは次のようなバイト列で表現されます。
+## Specifications
+A FourWord is represented as a byte sequence as follows:
 
 ```
-[ (全体のビット数/4) ビットのUNIXタイムスタンプ(UTC,ns) ] + [ (全体のビット数/4*3) ビットのCSPRNG ]
+[ (Total bits/4) bit UNIX timestamp (UTC, ns) ] + [ (Total bits/4*3) bit CSPRNG ]
 ```
 
-例えば全体のビット数が256ビットの時、タイムスタンプは64ビット、ランダムな部分は192ビットになります。
+For example, when the total bit size is 256 bits, the timestamp is 64 bits and the random part is 192 bits.
 
-FourWordはUUIDなどの他の方式と違い、テキスト化が必須ではありません。バイト列とテキストの両方の形式に対応しています。
+Unlike other methods like UUID, FourWord does not require text representation. It supports both byte sequence and text formats.
 
-### テキスト化
-テキスト化にはBase32 Hexのようなものを使用します。
+### Text Representation
+Text representation uses something similar to Base32 Hex.
 
-前述した通り、パディング文字として`=`の代わりに`Z`を使用しますが、それ以外はBase32 Hexと同じです。
+As mentioned above, it uses 'Z' instead of '=' as a padding character, but otherwise, it is identical to Base32 Hex.
 
-### 衝突確率
-タイムスタンプが異なるIDは衝突しません。以下は最悪ケース(全IDを同一ナノ秒内に生成)の場合の値です。
+### Collision Probability
+IDs with different timestamps will not collide. The values below are for the worst-case scenario (all IDs generated within the same nanosecond).
 
-| ビット数 | ランダムビット幅 | 衝突確率 10⁻¹⁸ に必要なID数 | 衝突確率 10⁻⁹ に必要なID数 | 衝突確率 50% に必要なID数 |
+| Bits | Random Bit Width | IDs for 10⁻¹⁸ Collision Probability | IDs for 10⁻⁹ Collision Probability | IDs for 50% Collision Probability |
 |---:|---:|:---|:---|:---|
-| 256 | 192 bit | 約 1.12 × 10²⁰ | 約 3.54 × 10²⁴ | 約 9.33 × 10²⁸ |
-| 512 | 384 bit | 約 8.88 × 10⁴⁸ | 約 2.81 × 10⁵³ | 約 7.39 × 10⁵⁷ |
-| 768 | 576 bit | 約 7.03 × 10⁷⁷ | 約 2.22 × 10⁸² | 約 5.85 × 10⁸⁶ |
-| 1024 | 768 bit | 約 5.57 × 10¹⁰⁶ | 約 1.76 × 10¹¹¹ | 約 4.64 × 10¹¹⁵ |
-| 1280 | 960 bit | 約 4.41 × 10¹³⁵ | 約 1.40 × 10¹⁴⁰ | 約 3.67 × 10¹⁴⁴ |
-| 1536 | 1152 bit | 約 3.50 × 10¹⁶⁴ | 約 1.11 × 10¹⁶⁹ | 約 2.91 × 10¹⁷³ |
-| 1792 | 1344 bit | 約 2.77 × 10¹⁹³ | 約 8.76 × 10¹⁹⁷ | 約 2.31 × 10²⁰² |
-| 2048 | 1536 bit | 約 2.20 × 10²²² | 約 6.94 × 10²²⁶ | 約 1.83 × 10²³¹ |
+| 256 | 192 bit | Approx. 1.12 × 10²⁰ | Approx. 3.54 × 10²⁴ | Approx. 9.33 × 10²⁸ |
+| 512 | 384 bit | Approx. 8.88 × 10⁴⁸ | Approx. 2.81 × 10⁵³ | Approx. 7.39 × 10⁵⁷ |
+| 768 | 576 bit | Approx. 7.03 × 10⁷⁷ | Approx. 2.22 × 10⁸² | Approx. 5.85 × 10⁸⁶ |
+| 1024 | 768 bit | Approx. 5.57 × 10¹⁰⁶ | Approx. 1.76 × 10¹¹¹ | Approx. 4.64 × 10¹¹⁵ |
+| 1280 | 960 bit | Approx. 4.41 × 10¹³⁵ | Approx. 1.40 × 10¹⁴⁰ | Approx. 3.67 × 10¹⁴⁴ |
+| 1536 | 1152 bit | Approx. 3.50 × 10¹⁶⁴ | Approx. 1.11 × 10¹⁶⁹ | Approx. 2.91 × 10¹⁷³ |
+| 1792 | 1344 bit | Approx. 2.77 × 10¹⁹³ | Approx. 8.76 × 10¹⁹⁷ | Approx. 2.31 × 10²⁰² |
+| 2048 | 1536 bit | Approx. 2.20 × 10²²² | Approx. 6.94 × 10²²⁶ | Approx. 1.83 × 10²³¹ |
 
-### オーバーフローの時期
-各ビット数では、次の時期にオーバーフローします。
+### Overflow Timeline
+Overflow will occur at the following times for each bit size:
 
-| ビット数 | タイムスタンプビット幅 | 最大秒数 | オーバーフロー時期（概算）|
+| Bits | Timestamp Bit Width | Max Seconds | Overflow Date (Approx.) |
 |---:|---:|:---|:---|
-| 256 | 64 bit | 約 1.84 × 10¹⁹ 秒 | 西暦約5844億年 (5.845 × 10¹¹ 年) |
-| 512 | 128 bit | 約 3.40 × 10³⁸ 秒 | 約 1.07 × 10³¹ 年後 |
-| 768 | 192 bit | 約 6.28 × 10⁵⁷ 秒 | 約 1.99 × 10⁵⁰ 年後 |
-| 1024 | 256 bit | 約 1.16 × 10⁷⁷ 秒 | 約 3.67 × 10⁶⁹ 年後 |
-| 1280 | 320 bit | 約 2.14 × 10⁹⁶ 秒 | 約 6.77 × 10⁸⁸ 年後 |
-| 1536 | 384 bit | 約 3.94 × 10¹¹⁵ 秒 | 約 1.25 × 10¹⁰⁸ 年後 |
-| 1792 | 448 bit | 約 7.26 × 10¹³⁴ 秒 | 約 2.30 × 10¹²⁷ 年後 |
-| 2048 | 512 bit | 約 1.34 × 10¹⁵⁴ 秒 | 約 4.24 × 10¹⁴⁶ 年後 |
+| 256 | 64 bit | Approx. 1.84 × 10¹⁹ seconds | Approx. 584.4 billion years AD (5.845 × 10¹¹ years) |
+| 512 | 128 bit | Approx. 3.40 × 10³⁸ seconds | Approx. 1.07 × 10³¹ years later |
+| 768 | 192 bit | Approx. 6.28 × 10⁵⁷ seconds | Approx. 1.99 × 10⁵⁰ years later |
+| 1024 | 256 bit | Approx. 1.16 × 10⁷⁷ seconds | Approx. 3.67 × 10⁶⁹ years later |
+| 1280 | 320 bit | Approx. 2.14 × 10⁹⁶ seconds | Approx. 6.77 × 10⁸⁸ years later |
+| 1536 | 384 bit | Approx. 3.94 × 10¹¹⁵ seconds | Approx. 1.25 × 10¹⁰⁸ years later |
+| 1792 | 448 bit | Approx. 7.26 × 10¹³⁴ seconds | Approx. 2.30 × 10¹²⁷ years later |
+| 2048 | 512 bit | Approx. 1.34 × 10¹⁵⁴ seconds | Approx. 4.24 × 10¹⁴⁶ years later |
 
-## ライセンス
-このリポジトリ内のソースコードやライブラリはMITライセンスの元で自由に使用できます。
+## License
+The source code and libraries in this repository are free to use under the MIT License.
 
-FourWordの仕様そのものを利用するソフトウェアや、FourWordで生成したデータなどではクレジット表記は不要です。
+Credit is not required for software that utilizes the FourWord specification itself or for data generated using FourWord.
