@@ -18,6 +18,17 @@ It is also a play on the word "Forward."
 
 ## Python Library
 ```
+# Install using pip
+pip3 install fourword
+
+# Install using uv
+uv pip install fourword
+
+# Add to Project using uv
+uv add fourword
+```
+
+```
 from fourword.lib import FourWord
 
 fourword = FourWord(bits=256)
