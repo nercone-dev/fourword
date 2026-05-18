@@ -49,7 +49,7 @@ It hasn't been tested thoroughly, but it should work.
 Once the library is installed, you should be able to use the `fourword-py` command.
 
 ## Specifications
-A FourWord is represented as a byte sequence as follows:
+A FourWord is represented as a byte sequence (big endian) as follows:
 
 ```
 [ (Total bits/4) bit UNIX timestamp (UTC, ns) ] + [ (Total bits/4*3) bit CSPRNG ]
