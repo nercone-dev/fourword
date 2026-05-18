@@ -46,6 +46,8 @@ A FourWord is represented as a byte sequence as follows:
 
 For example, when the total bit size is 256 bits, the timestamp is 64 bits and the random part is 192 bits.
 
+The ratio is fixed so that when retrieving the timestamp from an ID, the exact length can be easily determined without needing a separator.
+
 Unlike other methods like UUID, FourWord does not require text representation. It supports both byte sequence and text formats.
 
 ### Text Representation
