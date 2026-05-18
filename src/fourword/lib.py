@@ -49,3 +49,7 @@ class FourWord:
 
         pad_len = (8 - len(result) % 8) % 8
         return bytes(result).decode('ascii') + "Z" * pad_len
+
+    @property
+    def bytes(self) -> bytes:
+        return self.generated
