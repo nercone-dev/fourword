@@ -1,0 +1,12 @@
+[build-system]
+requires = ["uv_build>=0.9.5,<0.10.0"]
+build-backend = "uv_build"
+
+[project]
+name = "fourword"
+version = "1.0.0"
+requires-python = ">=3.9"
+dependencies = []
+
+[project.scripts]
+fourword-py = "fourword.cli:main"
