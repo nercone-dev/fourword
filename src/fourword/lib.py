@@ -6,13 +6,14 @@ class FourWord:
     def __init__(self, arg: str | bytes | int | None = 256, dt: datetime | None = None):
         self.bytes = None
         if isinstance(arg, str):
-            self.bytes = self.from_text(arg).bytes
+            self.bytes = FourWord.from_text(arg).bytes
         elif isinstance(arg, bytes):
             self.bytes = arg
         elif isinstance(arg, int):
             self.bytes = self.generate(arg, dt)
 
-    def from_text(self, text: str) -> "FourWord":
+    @staticmethod
+    def from_text(text: str) -> "FourWord":
         chars = "0123456789ABCDEFGHIJKLMNOPQRSTUV"
         text = text.rstrip('Z')
         bits_val = 0
