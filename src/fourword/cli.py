@@ -22,10 +22,11 @@ def cmd_generate(args):
         sys.exit(1)
 
     if args.verbose:
-        print(f"Bits  : {args.bits}")
-        print(f"Time  : {fw.timestamp.isoformat()}")
-        print(f"Text  : {fw.text}")
-        print(f"Bytes : {fw.bytes.hex()}")
+        print(f"Text     : {fw.text}")
+        print(f"Hex      : {fw.bytes.hex()}")
+        print(f"Bits     : {args.bits}")
+        print(f"Timestamp: {fw.timestamp.isoformat()}")
+        print(f"Unix (ns): {int(fw.timestamp.timestamp() * 1_000_000_000)}")
     else:
         print(fw.text)
 
@@ -40,7 +41,7 @@ def cmd_info(args):
     print(f"Hex      : {fw.bytes.hex()}")
     print(f"Bits     : {len(fw.bytes) * 8}")
     print(f"Timestamp: {fw.timestamp.isoformat()}")
-    print(f"Unix(ns) : {int(fw.timestamp.timestamp() * 1_000_000_000)}")
+    print(f"Unix (ns): {int(fw.timestamp.timestamp() * 1_000_000_000)}")
 
 def main():
     parser = argparse.ArgumentParser(prog="fourword", description="Generate and parse FourWord identifiers.")
