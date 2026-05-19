@@ -1,43 +1,60 @@
-import time
 import secrets
 import warnings
-import functools
+from datetime import datetime, timezone
 
 class FourWord:
-    def __init__(self, bits: int = 256):
-        self.bits = bits
-        self.generate()
+    def __init__(self, arg: str | bytes | int | None = 256, dt: datetime | None = None):
+        self.bytes = None
+        if isinstance(arg, str):
+            self.bytes = self.from_text(arg).bytes
+        elif isinstance(arg, bytes):
+            self.bytes = arg
+        elif isinstance(arg, int):
+            self.bytes = self.generate(arg, dt)
 
-    def generate(self, bits: int | None = None) -> bytes:
-        if bits:
-            self.bits = bits
+    def from_text(text: str) -> "FourWord":
+        chars = "0123456789ABCDEFGHIJKLMNOPQRSTUV"
+        text = text.rstrip('Z')
+        bits_val = 0
+        for c in text:
+            bits_val = (bits_val << 5) | chars.index(c)
+        total_bits = len(text) * 5
+        byte_len = total_bits // 8
+        bits_val >>= total_bits % 8
+        return FourWord(bits_val.to_bytes(byte_len, 'big'))
 
-        if self.bits % 32 != 0:
+    def generate(self, bits: int = 256, dt: datetime | None = None) -> bytes:
+        if bits % 32 != 0:
             warnings.warn("The number of bits is not divisible by 32. The actual generated length may not match the number of bits.", BytesWarning, stacklevel=2)
 
-        timestamp_bits = self.bits // 4
-        csprng_bits = (self.bits // 4) * 3
+        if dt is not None:
+            if dt.tzinfo is not None:
+                dt_utc = dt
+            else:
+                dt_utc = dt.replace(tzinfo=timezone.utc)
+        else:
+            dt_utc = datetime.now(timezone.utc)
 
-        time_ns = time.time_ns()
+        time_ns = int(dt_utc.timestamp() * 1_000_000_000)
+
+        bits_timestamp = bits // 4
+        bits_csprng = (bits // 4) * 3
+
         try:
-            timestamp = time_ns.to_bytes(timestamp_bits // 8, byteorder='big')
-
+            timestamp = time_ns.to_bytes(bits_timestamp // 8, byteorder='big')
         except OverflowError:
-            bytes_needed = ((time_ns.bit_length() + 7) // 8) * 4
-            bits_needed = bytes_needed * 8
+            bits_needed = ((time_ns.bit_length() + 7) // 8) * 32
             raise OverflowError(f"bits must be >= {bits_needed} (timestamp requires {time_ns.bit_length()}-bit minimum)")
 
-        random = secrets.token_bytes(int(csprng_bits / 8))
+        random = secrets.token_bytes(int(bits_csprng / 8))
+        return timestamp + random
 
-        self.generated = timestamp + random
-        return self.generated
-
-    @functools.cached_property
+    @property
     def text(self) -> str:
         chars = b"0123456789ABCDEFGHIJKLMNOPQRSTUV"
         result = []
-        bits = int.from_bytes(self.generated, "big")
-        bit_len = len(self.generated) * 8
+        bits = int.from_bytes(self.bytes, "big")
+        bit_len = len(self.bytes) * 8
 
         pad = (5 - bit_len % 5) % 5
         bits <<= pad
@@ -51,5 +68,7 @@ class FourWord:
         return bytes(result).decode('ascii') + "Z" * pad_len
 
     @property
-    def bytes(self) -> bytes:
-        return self.generated
+    def timestamp(self) -> datetime:
+        ts_byte_len = len(self.bytes) // 4
+        time_ns = int.from_bytes(self.bytes[:ts_byte_len], byteorder='big')
+        return datetime.fromtimestamp(time_ns / 1_000_000_000, tz=timezone.utc)
