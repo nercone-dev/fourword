@@ -67,15 +67,42 @@ For example, when the total bit length is 256 bits, the timestamp is 64 bits and
 
 The ratio is fixed so that when retrieving the timestamp from an ID, the exact length can be easily determined without needing a separator.
 
-Unlike other methods such as UUID, FourWord does not strictly require text conversion. It supports both byte sequence and text formats.
+### Formats
+Unlike other methods, FourWord does not strictly require text conversion. It supports multiple formats.
 
-### Numericalization
-Numericalization is simply a matter of interpreting the byte sequence as a binary number and converting it to decimal.
+**Text**
 
-### Text Conversion
 Text conversion uses a variant of Base32 Hex.
 
 As mentioned above, Z is used instead of = as the padding character, but otherwise, it is identical to Base32 Hex.
+
+**Readable Text**
+
+Based on the Text format, with the following modifications for human readability:
+
+- Character set is lowercased (`0-9, A-V` → `0-9, a-v`)
+- Padding is omitted (since bit length is fixed, it can be restored during decoding)
+- A hyphen (`-`) is inserted every 8 characters
+
+**Compact Text**
+
+Uses Base62 (`0-9A-Za-z`) as the character set.
+The byte sequence is interpreted as a big-endian arbitrary-precision integer and converted to Base62.
+Zero-padded with `0` at the front so that the same bit length always produces a fixed-length output.
+
+Approximately 76% the length of the Text format.
+For example, at 256 bits, the Text format is 56 characters while Compact Text fits in 43 characters.
+
+Note that since Base62 is not a power of 2, bitwise operations cannot be used and arbitrary-precision integer arithmetic is required for decoding.
+It also cannot be used in case-insensitive environments.
+
+**Decimal**
+
+Simply interprets the byte sequence as a binary number and converts it to decimal.
+
+**Hex**
+
+Like Decimal, simply interprets the byte sequence as a binary number and converts it to hexadecimal.
 
 ### Collision Probability
 IDs with different timestamps do not collide. The values below represent the worst-case scenario (all IDs generated within the same nanosecond).
