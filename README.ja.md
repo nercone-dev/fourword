@@ -44,7 +44,7 @@ fourword --help
 fourword generate
 fourword generate --bits 512
 fourword generate --verbose
-fourword i ABA78127AEFG567T3TRA77891S871A9DFG98PLAABS7898120128
+fourword i 32OD9FEO1M8G0I7A0CMGMC599N14NJQ9SQAJPT3TRATETRAMBKTGZZZZ
 ```
 
 Pythonでは`fourword`ライブラリを使用してFourWordを生成/分析できます。
@@ -62,6 +62,9 @@ FourWordは次のようなバイト列(ビッグエンディアン)で表現さ�
 比率が固定なのは、IDからタイムスタンプを取得する際、セパレータを設けなくても確実な長さが簡単にわかるようにするためです。
 
 FourWordはUUIDなどの他の方式と違い、テキスト化が必須ではありません。バイト列とテキストの両方の形式に対応しています。
+
+### 数値化
+数値化は単にバイト列を二進数として解釈して十進数にするだけです。
 
 ### テキスト化
 テキスト化にはBase32 Hexのようなものを使用します。

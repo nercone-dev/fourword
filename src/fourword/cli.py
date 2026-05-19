@@ -23,7 +23,8 @@ def cmd_generate(args):
 
     if args.verbose:
         print(f"Text     : {fw.text}")
-        print(f"Hex      : {fw.bytes.hex()}")
+        print(f"Int      : {fw.int}")
+        print(f"Hex      : {fw.hex}")
         print(f"Bits     : {args.bits}")
         print(f"Timestamp: {fw.timestamp.isoformat()}")
         print(f"Unix (ns): {int(fw.timestamp.timestamp() * 1_000_000_000)}")
@@ -38,7 +39,8 @@ def cmd_info(args):
         sys.exit(1)
 
     print(f"Text     : {args.id}")
-    print(f"Hex      : {fw.bytes.hex()}")
+    print(f"Int      : {fw.int}")
+    print(f"Hex      : {fw.hex}")
     print(f"Bits     : {len(fw.bytes) * 8}")
     print(f"Timestamp: {fw.timestamp.isoformat()}")
     print(f"Unix (ns): {int(fw.timestamp.timestamp() * 1_000_000_000)}")

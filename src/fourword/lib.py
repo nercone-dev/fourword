@@ -51,6 +51,12 @@ class FourWord:
         return timestamp + random
 
     @property
+    def timestamp(self) -> datetime:
+        ts_byte_len = len(self.bytes) // 4
+        time_ns = int.from_bytes(self.bytes[:ts_byte_len], byteorder='big')
+        return datetime.fromtimestamp(time_ns / 1_000_000_000, tz=timezone.utc)
+
+    @property
     def text(self) -> str:
         chars = b"0123456789ABCDEFGHIJKLMNOPQRSTUV"
         result = []
@@ -69,7 +75,9 @@ class FourWord:
         return bytes(result).decode('ascii') + "Z" * pad_len
 
     @property
-    def timestamp(self) -> datetime:
-        ts_byte_len = len(self.bytes) // 4
-        time_ns = int.from_bytes(self.bytes[:ts_byte_len], byteorder='big')
-        return datetime.fromtimestamp(time_ns / 1_000_000_000, tz=timezone.utc)
+    def int(self) -> int:
+        return int.from_bytes(self.bytes, 'big')
+
+    @property
+    def hex(self) -> str:
+        return self.bytes.hex()

@@ -42,7 +42,7 @@ fourword --help
 fourword generate
 fourword generate --bits 512
 fourword generate --verbose
-fourword i ABA78127AEFG567T3TRA77891S871A9DFG98PLAABS7898120128
+fourword i 32OD9FEO1M8G0I7A0CMGMC599N14NJQ9SQAJPT3TRATETRAMBKTGZZZZ
 ```
 
 You can generate and analyze FourWord using the fourword library in Python.
@@ -60,6 +60,9 @@ For example, when the total bit length is 256 bits, the timestamp is 64 bits and
 The ratio is fixed so that when retrieving the timestamp from an ID, the exact length can be easily determined without needing a separator.
 
 Unlike other methods such as UUID, FourWord does not strictly require text conversion. It supports both byte sequence and text formats.
+
+### Numericalization
+Numericalization is simply a matter of interpreting the byte sequence as a binary number and converting it to decimal.
 
 ### Text Conversion
 Text conversion uses a variant of Base32 Hex.
