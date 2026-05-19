@@ -40,10 +40,15 @@ print(fourword.timestamp.isoformat())
 ```
 
 ```sh
+# Show usage
 fourword --help
-fourword generate
-fourword generate --bits 512
-fourword generate --verbose
+# Generate FourWord ID with default(256) bits
+fourword g
+# Generate FourWord ID with custom 512 bits
+fourword g --bits 512
+# Generate FourWord ID and Show with details
+fourword g --verbose
+# Decode FourWord ID and Show with details
 fourword i 32OD9FEO1M8G0I7A0CMGMC599N14NJQ9SQAJPT3TRATETRAMBKTGZZZZ
 ```
 
