@@ -1,19 +1,20 @@
 # FourWord
+A new random identifier generation method capable of chronological sorting
 
 ## Overview
-A new generation method for random identifiers.
+This is a new method for generating random identifiers.
+It is designed for use as primary keys in databases and similar applications.
 
-It includes a timestamp at the beginning and uses Base32 Hex as the character set for text representation, allowing for sorting in chronological order.
-Since 'Z' is used instead of '=' for padding, it should be usable in any environment that supports alphanumeric characters.
+It includes a timestamp at the beginning and uses Base32 Hex as the character set for text conversion, allowing for sorting in chronological order.
+Since Z is used instead of = for padding, it should be usable anywhere alphanumeric characters are supported.
 
-To minimize the possibility of collisions while preventing overflow, the timestamp is not fixed; instead, it occupies 1/4 of the total bits generated.
-This allows for longer continuous use simply by increasing the total number of bits.
-However, as a trade-off, unnecessary leading zeros will appear at the beginning of the timestamp portion.
+To minimize the possibility of collisions while also preventing overflow, the timestamp is not fixed but occupies 1/4 of the total bit length.
+This means that simply increasing the total bit length increases the length of the timestamp, allowing for longer continuous usage.
 
-It is intended for use in databases and similar applications.
+However, a trade-off is that increasing the bit length results in unnecessary leading zeros in the timestamp section.
 
 ## Etymology
-The "Four" part comes from the fact that the timestamp occupies 1/4 of the total bits.
+The "Four" in the name comes from the fact that the timestamp occupies 1/4 of the bit length.
 It is also a play on the word "Forward."
 
 ## Python Library
@@ -33,62 +34,67 @@ from fourword.lib import FourWord
 
 fourword = FourWord(bits=256)
 print(fourword.text)
+print(fourword.timestamp.isoformat())
 ```
 
-In Python, you can generate FourWord using the fourword library.
-The fourword library works without any external dependencies.
+```
+fourword --help
+fourword generate
+fourword generate --bits 512
+fourword generate --verbose
+fourword i ABA78127AEFG567T3TRA77891S871A9DFG98PLAABS7898120128
+```
 
-The default bit size is 256.
-
-The total number of bits must be divisible by 32.
+You can generate and analyze FourWord using the fourword library in Python.
+The Python library also includes a fourword CLI tool.
 
 ## Specifications
-A FourWord is represented as a byte sequence (big endian) as follows:
+FourWord is represented as the following byte sequence (big-endian):
 
 ```
 [ (Total bits/4) bit UNIX timestamp (UTC, ns) ] + [ (Total bits/4*3) bit CSPRNG ]
 ```
 
-For example, when the total bit size is 256 bits, the timestamp is 64 bits and the random part is 192 bits.
+For example, when the total bit length is 256 bits, the timestamp is 64 bits and the random part is 192 bits.
 
 The ratio is fixed so that when retrieving the timestamp from an ID, the exact length can be easily determined without needing a separator.
 
-Unlike other methods like UUID, FourWord does not require text representation. It supports both byte sequence and text formats.
+Unlike other methods such as UUID, FourWord does not strictly require text conversion. It supports both byte sequence and text formats.
 
-### Text Representation
-Text representation uses something similar to Base32 Hex.
+### Text Conversion
+Text conversion uses a variant of Base32 Hex.
 
-As mentioned above, it uses 'Z' instead of '=' as a padding character, but otherwise, it is identical to Base32 Hex.
+As mentioned above, Z is used instead of = as the padding character, but otherwise, it is identical to Base32 Hex.
 
 ### Collision Probability
-IDs with different timestamps will not collide. The values below are for the worst-case scenario (all IDs generated within the same nanosecond).
+IDs with different timestamps do not collide. The values below represent the worst-case scenario (all IDs generated within the same nanosecond).
 
-| Bits | Random Bit Width | IDs for 10⁻¹⁸ Collision Probability | IDs for 10⁻⁹ Collision Probability | IDs for 50% Collision Probability |
+| Bits | Random bit width | IDs for 10⁻¹⁸ collision prob. | IDs for 10⁻⁹ collision prob. | IDs for 50% collision prob. |
 |---:|---:|:---|:---|:---|
-| 256 | 192 bit | Approx. 1.12 × 10²⁰ | Approx. 3.54 × 10²⁴ | Approx. 9.33 × 10²⁸ |
-| 512 | 384 bit | Approx. 8.88 × 10⁴⁸ | Approx. 2.81 × 10⁵³ | Approx. 7.39 × 10⁵⁷ |
-| 768 | 576 bit | Approx. 7.03 × 10⁷⁷ | Approx. 2.22 × 10⁸² | Approx. 5.85 × 10⁸⁶ |
-| 1024 | 768 bit | Approx. 5.57 × 10¹⁰⁶ | Approx. 1.76 × 10¹¹¹ | Approx. 4.64 × 10¹¹⁵ |
-| 1280 | 960 bit | Approx. 4.41 × 10¹³⁵ | Approx. 1.40 × 10¹⁴⁰ | Approx. 3.67 × 10¹⁴⁴ |
-| 1536 | 1152 bit | Approx. 3.50 × 10¹⁶⁴ | Approx. 1.11 × 10¹⁶⁹ | Approx. 2.91 × 10¹⁷³ |
-| 1792 | 1344 bit | Approx. 2.77 × 10¹⁹³ | Approx. 8.76 × 10¹⁹⁷ | Approx. 2.31 × 10²⁰² |
-| 2048 | 1536 bit | Approx. 2.20 × 10²²² | Approx. 6.94 × 10²²⁶ | Approx. 1.83 × 10²³¹ |
+| 256 | 192 bit | approx 1.12 × 10²⁰ | approx 3.54 × 10²⁴ | approx 9.33 × 10²⁸ |
+| 512 | 384 bit | approx 8.88 × 10⁴⁸ | approx 2.81 × 10⁵³ | approx 7.39 × 10⁵⁷ |
+| 768 | 576 bit | approx 7.03 × 10⁷⁷ | approx 2.22 × 10⁸² | approx 5.85 × 10⁸⁶ |
+| 1024 | 768 bit | approx 5.57 × 10¹⁰⁶ | approx 1.76 × 10¹¹¹ | approx 4.64 × 10¹¹⁵ |
+| 1280 | 960 bit | approx 4.41 × 10¹³⁵ | approx 1.40 × 10¹⁴⁰ | approx 3.67 × 10¹⁴⁴ |
+| 1536 | 1152 bit | approx 3.50 × 10¹⁶⁴ | approx 1.11 × 10¹⁶⁹ | approx 2.91 × 10¹⁷³ |
+| 1792 | 1344 bit | approx 2.77 × 10¹⁹³ | approx 8.76 × 10¹⁹⁷ | approx 2.31 × 10²⁰² |
+| 2048 | 1536 bit | approx 2.20 × 10²²² | approx 6.94 × 10²²⁶ | approx 1.83 × 10²³¹ |
 
-### Overflow Timeline
-Overflow will occur at the following times for each bit size:
+### Overflow Timing
+Each bit length will overflow at the following times:
 
-| Bits | Timestamp Bit Width | Max Seconds | Overflow Date (Approx.) |
+| Bits | Timestamp bit width | Max seconds | Overflow timing (approx) |
 |---:|---:|:---|:---|
-| 256 | 64 bit | Approx. 1.84 × 10¹⁹ seconds | Approx. 584.4 billion years AD (5.845 × 10¹¹ years) |
-| 512 | 128 bit | Approx. 3.40 × 10³⁸ seconds | Approx. 1.07 × 10³¹ years later |
-| 768 | 192 bit | Approx. 6.28 × 10⁵⁷ seconds | Approx. 1.99 × 10⁵⁰ years later |
-| 1024 | 256 bit | Approx. 1.16 × 10⁷⁷ seconds | Approx. 3.67 × 10⁶⁹ years later |
-| 1280 | 320 bit | Approx. 2.14 × 10⁹⁶ seconds | Approx. 6.77 × 10⁸⁸ years later |
-| 1536 | 384 bit | Approx. 3.94 × 10¹¹⁵ seconds | Approx. 1.25 × 10¹⁰⁸ years later |
-| 1792 | 448 bit | Approx. 7.26 × 10¹³⁴ seconds | Approx. 2.30 × 10¹²⁷ years later |
-| 2048 | 512 bit | Approx. 1.34 × 10¹⁵⁴ seconds | Approx. 4.24 × 10¹⁴⁶ years later |
+| 256 | 64 bit | approx 1.84 × 10¹⁹ s | approx 584.4 billion years AD (5.845 × 10¹¹ years) |
+| 512 | 128 bit | approx 3.40 × 10³⁸ s | approx 1.07 × 10³¹ years later |
+| 768 | 192 bit | approx 6.28 × 10⁵⁷ s | approx 1.99 × 10⁵⁰ years later |
+| 1024 | 256 bit | approx 1.16 × 10⁷⁷ s | approx 3.67 × 10⁶⁹ years later |
+| 1280 | 320 bit | approx 2.14 × 10⁹⁶ s | approx 6.77 × 10⁸⁸ years later |
+| 1536 | 384 bit | approx 3.94 × 10¹¹⁵ s | approx 1.25 × 10¹⁰⁸ years later |
+| 1792 | 448 bit | approx 7.26 × 10¹³⁴ s | approx 2.30 × 10¹²⁷ years later |
+| 2048 | 512 bit | approx 1.34 × 10¹⁵⁴ s | approx 4.24 × 10¹⁴⁶ years later |
 
 ## License
-The source code and libraries in this repository are free to use under the MIT License.
+The source code and library within this repository are free to use under the MIT License.
 
 Credit is not required for software that utilizes the FourWord specification itself or for data generated using FourWord.
