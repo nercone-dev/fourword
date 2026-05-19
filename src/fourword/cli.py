@@ -28,6 +28,7 @@ def cmd_generate(args):
         print(f"Bits     : {args.bits}")
         print(f"Timestamp: {fw.timestamp.isoformat()}")
         print(f"Unix (ns): {int(fw.timestamp.timestamp() * 1_000_000_000)}")
+        print(f"Unix (ms): {int(fw.timestamp.timestamp() * 1_000_000_000) // 1000}")
     else:
         print(fw.text)
 
@@ -44,6 +45,7 @@ def cmd_info(args):
     print(f"Bits     : {len(fw.bytes) * 8}")
     print(f"Timestamp: {fw.timestamp.isoformat()}")
     print(f"Unix (ns): {int(fw.timestamp.timestamp() * 1_000_000_000)}")
+    print(f"Unix (ms): {int(fw.timestamp.timestamp() * 1_000_000_000) // 1000}")
 
 def main():
     parser = argparse.ArgumentParser(prog="fourword", description="Generate and parse FourWord identifiers.")
