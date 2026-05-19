@@ -26,7 +26,7 @@ class FourWord:
 
     def generate(self, bits: int = 256, dt: datetime | None = None) -> bytes:
         if bits % 32 != 0:
-            warnings.warn("The number of bits is not divisible by 32. The actual generated length may not match the number of bits.", BytesWarning, stacklevel=2)
+            warnings.warn("The number of bits is not divisible by 32. The actual generated length may not match the number of bits.", UserWarning, stacklevel=2)
 
         if dt is not None:
             if dt.tzinfo is not None:
