@@ -23,6 +23,8 @@ def cmd_generate(args):
 
     if args.detail:
         print(f"Text     : {fw.text}")
+        print(f"Compact  : {fw.compact_text}")
+        print(f"Readable : {fw.readable_text}")
         print(f"Decimal  : {fw.int}")
         print(f"Hex      : {fw.hex}")
         print(f"Bits     : {args.bits}")
@@ -40,6 +42,8 @@ def cmd_info(args):
         sys.exit(1)
 
     print(f"Text     : {args.id}")
+    print(f"Compact  : {fw.compact_text}")
+    print(f"Readable : {fw.readable_text}")
     print(f"Decimal  : {fw.int}")
     print(f"Hex      : {fw.hex}")
     print(f"Bits     : {len(fw.bytes) * 8}")
