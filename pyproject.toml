@@ -4,7 +4,7 @@ build-backend = "uv_build"
 
 [project]
 name = "fourword"
-version = "1.1.0"
+version = "1.2.0"
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = []
@@ -13,4 +13,4 @@ dependencies = []
 'GitHub' = 'https://github.com/nercone-labs/fourword/'
 
 [project.scripts]
-fourword-py = "fourword.cli:main"
+fourword = "fourword.cli:main"

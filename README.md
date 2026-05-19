@@ -42,12 +42,6 @@ The default bit size is 256.
 
 The total number of bits must be divisible by 32.
 
-### CLI Tool
-There is a CLI tool that I had an AI create.
-It hasn't been tested thoroughly, but it should work.
-
-Once the library is installed, you should be able to use the `fourword-py` command.
-
 ## Specifications
 A FourWord is represented as a byte sequence (big endian) as follows:
 

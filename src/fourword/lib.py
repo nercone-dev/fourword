@@ -12,7 +12,7 @@ class FourWord:
         elif isinstance(arg, int):
             self.bytes = self.generate(arg, dt)
 
-    def from_text(text: str) -> "FourWord":
+    def from_text(self, text: str) -> "FourWord":
         chars = "0123456789ABCDEFGHIJKLMNOPQRSTUV"
         text = text.rstrip('Z')
         bits_val = 0
