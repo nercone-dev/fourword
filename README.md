@@ -1,3 +1,5 @@
+![](https://assets.nercone.dev/images/thumbnail/fourword.png)
+
 # FourWord
 A new random identifier generation method capable of chronological sorting
 

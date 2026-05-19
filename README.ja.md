@@ -1,3 +1,5 @@
+![](https://assets.nercone.dev/images/thumbnail/fourword.png)
+
 # FourWord
 時系列ソートが可能な新しいランダム識別子の生成方式
 
