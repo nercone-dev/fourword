@@ -50,8 +50,9 @@ fourword g --verbose
 fourword i 32OD9FEO1M8G0I7A0CMGMC599N14NJQ9SQAJPT3TRATETRAMBKTGZZZZ
 ```
 
-You can generate and analyze FourWord using the fourword library in Python.
-The Python library also includes a fourword CLI tool.
+You can generate and analyze FourWord using the `fourword` library in Python.
+
+The Python library also includes a `fourword` CLI command.
 
 ## Specifications
 FourWord is represented as the following byte sequence (big-endian):

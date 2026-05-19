@@ -53,7 +53,8 @@ fourword i 32OD9FEO1M8G0I7A0CMGMC599N14NJQ9SQAJPT3TRATETRAMBKTGZZZZ
 ```
 
 Pythonでは`fourword`ライブラリを使用してFourWordを生成/分析できます。
-また、Pythonライブラリには`fourword`CLIツールも付属しています。
+
+また、Pythonライブラリには`fourword`CLIコマンドも付属しています。
 
 ## 仕様
 FourWordは次のようなバイト列(ビッグエンディアン)で表現されます。
