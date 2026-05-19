@@ -21,9 +21,9 @@ def cmd_generate(args):
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)
 
-    if args.verbose:
+    if args.detail:
         print(f"Text     : {fw.text}")
-        print(f"Int      : {fw.int}")
+        print(f"Decimal  : {fw.int}")
         print(f"Hex      : {fw.hex}")
         print(f"Bits     : {args.bits}")
         print(f"Timestamp: {fw.timestamp.isoformat()}")
@@ -40,7 +40,7 @@ def cmd_info(args):
         sys.exit(1)
 
     print(f"Text     : {args.id}")
-    print(f"Int      : {fw.int}")
+    print(f"Decimal  : {fw.int}")
     print(f"Hex      : {fw.hex}")
     print(f"Bits     : {len(fw.bytes) * 8}")
     print(f"Timestamp: {fw.timestamp.isoformat()}")
@@ -55,7 +55,7 @@ def main():
     generate = subparsers.add_parser("generate", aliases=["gen", "g"], help="Generate a new FourWord ID")
     generate.add_argument("--bits", "-b", type=int, default=256, metavar="N", help="Total bit size (must be divisible by 32, default: 256)")
     generate.add_argument("--datetime", "-d", type=str, default=None, metavar="ISO8601", help="Timestamp to embed (ISO 8601, default: now)")
-    generate.add_argument("--verbose", "-v", action="store_true", help="Show bits, timestamp, text, and hex")
+    generate.add_argument("--detail", "-d", action="store_true", help="Show details")
     generate.set_defaults(func=cmd_generate)
 
     # info
@@ -68,7 +68,7 @@ def main():
     if args.command is None:
         args.bits = 256
         args.datetime = None
-        args.verbose = False
+        args.detail = False
         args.func = cmd_generate
 
     args.func(args)
