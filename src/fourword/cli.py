@@ -55,7 +55,7 @@ def main():
     generate = subparsers.add_parser("generate", aliases=["gen", "g"], help="Generate a new FourWord ID")
     generate.add_argument("--bits", "-b", type=int, default=256, metavar="N", help="Total bit size (must be divisible by 32, default: 256)")
     generate.add_argument("--datetime", "-d", type=str, default=None, metavar="ISO8601", help="Timestamp to embed (ISO 8601, default: now)")
-    generate.add_argument("--detail", "-d", action="store_true", help="Show details")
+    generate.add_argument("--detail", action="store_true", help="Show details")
     generate.set_defaults(func=cmd_generate)
 
     # info
