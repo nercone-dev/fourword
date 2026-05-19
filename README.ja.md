@@ -20,7 +20,7 @@ Fourの部分は、タイムスタンプがビット数の1/4を占めること�
 ~~全体のビット数はね、うーん...これくらい。タイムスタンプが、4個分くらいかな~~
 
 ## Pythonライブラリ
-```
+```sh
 # Install using pip
 pip3 install fourword
 
@@ -31,7 +31,7 @@ uv pip install fourword
 uv add fourword
 ```
 
-```
+```python
 from fourword.lib import FourWord
 
 fourword = FourWord(bits=256)
@@ -39,7 +39,7 @@ print(fourword.text)
 print(fourword.timestamp.isoformat())
 ```
 
-```
+```sh
 fourword --help
 fourword generate
 fourword generate --bits 512

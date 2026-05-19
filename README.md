@@ -18,7 +18,7 @@ The "Four" in the name comes from the fact that the timestamp occupies 1/4 of th
 It is also a play on the word "Forward."
 
 ## Python Library
-```
+```sh
 # Install using pip
 pip3 install fourword
 
@@ -29,7 +29,7 @@ uv pip install fourword
 uv add fourword
 ```
 
-```
+```python
 from fourword.lib import FourWord
 
 fourword = FourWord(bits=256)
@@ -37,7 +37,7 @@ print(fourword.text)
 print(fourword.timestamp.isoformat())
 ```
 
-```
+```sh
 fourword --help
 fourword generate
 fourword generate --bits 512
