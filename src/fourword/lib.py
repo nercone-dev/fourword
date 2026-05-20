@@ -168,10 +168,6 @@ class FourWord:
         return int.from_bytes(self.bytes, 'big')
 
     @property
-    def int(self) -> int:
-        return int.from_bytes(self.bytes, 'big')
-
-    @property
     def hex(self) -> str:
         return self.bytes.hex()
 
@@ -179,4 +175,4 @@ class FourWord:
         return self.text
 
     def __int__(self) -> int:
-        return self.int
+        return self.decimal
