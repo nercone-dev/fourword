@@ -6,11 +6,45 @@ from datetime import datetime, timezone
 class FourWord:
     def __init__(self, arg: str | bytes | int = 256, dt: datetime | None = None):
         if isinstance(arg, str):
-            self.bytes = FourWord.from_text(arg).bytes
+            detected_format = FourWord.detect_format(arg)
+            if detected_format == 'readable':
+                self.bytes = FourWord.from_readable_text(arg).bytes
+            elif detected_format == 'compact':
+                self.bytes = FourWord.from_compact_text(arg).bytes
+            elif detected_format == 'decimal':
+                self.bytes = FourWord.from_decimal(arg).bytes
+            elif detected_format == 'hex':
+                self.bytes = FourWord.from_hex(arg).bytes
+            else:
+                self.bytes = FourWord.from_text(arg).bytes
         elif isinstance(arg, bytes):
             self.bytes = arg
         elif isinstance(arg, int):
-            self.bytes = self.generate(arg, dt)
+            if arg % 32 == 0 and 32 <= arg <= 65536:
+                self.bytes = self.generate(arg, dt)
+            else:
+                self.bytes = FourWord.from_decimal(arg).bytes
+
+    @staticmethod
+    def detect_format(text: str) -> str:
+        if not text:
+            return 'text'
+        if '-' in text:
+            return 'readable'
+        if text.isdigit():
+            return 'decimal'
+
+        has_upper = any(c.isupper() for c in text)
+        has_lower = any(c.islower() for c in text)
+
+        if (has_upper and has_lower) or any(c in 'WXYwxyz' for c in text):
+            return 'compact'
+        if has_lower and all(c in '0123456789abcdef' for c in text):
+            return 'hex'
+        if has_lower:
+            return 'readable'
+
+        return 'text'
 
     @staticmethod
     def from_text(text: str) -> "FourWord":
@@ -39,6 +73,27 @@ class FourWord:
         clean = text.replace('-', '').upper()
         pad = (8 - len(clean) % 8) % 8
         return FourWord.from_text(clean + 'Z' * pad)
+
+    @staticmethod
+    def from_decimal(value: int | str, bits: int | None = None) -> "FourWord":
+        n = int(value)
+        if bits is not None:
+            return FourWord(n.to_bytes(bits // 8, 'big'))
+        min_bytes = max((n.bit_length() + 7) // 8, 1)
+        byte_len = ((min_bytes + 3) // 4) * 4
+        while byte_len <= 65536 // 8:
+            ts_ns = n >> (byte_len * 6)
+            try:
+                datetime.fromtimestamp(ts_ns / 1_000_000_000, tz=timezone.utc)
+                return FourWord(n.to_bytes(byte_len, 'big'))
+            except (OSError, OverflowError, ValueError):
+                byte_len += 4
+        raise ValueError("Cannot determine bit length from decimal representation. Specify it explicitly with FourWord like: from_decimal(value, bits=N)")
+
+    @staticmethod
+    def from_hex(text: str) -> "FourWord":
+        raw = bytes.fromhex(text)
+        return FourWord(raw)
 
     def generate(self, bits: int = 256, dt: datetime | None = None) -> bytes:
         if bits % 32 != 0:
@@ -107,6 +162,10 @@ class FourWord:
     def readable_text(self) -> str:
         raw = self.text.rstrip('Z').lower()
         return '-'.join(raw[i:i+8] for i in range(0, len(raw), 8))
+
+    @property
+    def decimal(self) -> int:
+        return int.from_bytes(self.bytes, 'big')
 
     @property
     def int(self) -> int:
