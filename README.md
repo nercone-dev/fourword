@@ -72,19 +72,19 @@ Unlike other methods, FourWord does not strictly require text conversion. It sup
 
 **Text**
 
+```
+32OD9FEO1M8G0I7A0CMGMC599N14NJQ9SQAJPT3TRATETRAMBKTGZZZZ
+```
+
 Text conversion uses a variant of Base32 Hex.
 
 As mentioned above, Z is used instead of = as the padding character, but otherwise, it is identical to Base32 Hex.
 
-**Readable Text**
-
-Based on the Text format, with the following modifications for human readability:
-
-- Character set is lowercased (`0-9, A-V` → `0-9, a-v`)
-- Padding is omitted (since bit length is fixed, it can be restored during decoding)
-- A hyphen (`-`) is inserted every 8 characters
-
 **Compact Text**
+
+```
+5r0NHGp8VYQuT2sVX1OZNDXn9XRg3qar5CsaahtCi7f
+```
 
 Uses Base62 (`0-9A-Za-z`) as the character set.
 The byte sequence is interpreted as a big-endian arbitrary-precision integer and converted to Base62.
@@ -96,11 +96,31 @@ For example, at 256 bits, the Text format is 56 characters while Compact Text fi
 Note that since Base62 is not a power of 2, bitwise operations cannot be used and arbitrary-precision integer arithmetic is required for decoding.
 It also cannot be used in case-insensitive environments.
 
+**Readable Text**
+
+```
+32od9feo-1m8g0i7a-0cmgmc59-9n14njq9-sqajpt3t-ratetram-bktg
+```
+
+Based on the Text format, with the following modifications for human readability:
+
+- Character set is lowercased (`0-9, A-V` → `0-9, a-v`)
+- Padding is omitted (since bit length is fixed, it can be restored during decoding)
+- A hyphen (`-`) is inserted every 8 characters
+
 **Decimal**
+
+```
+11167941737807864551984210163608533232246628802352979308802140359026483289403
+```
 
 Simply interprets the byte sequence as a binary number and converts it to decimal.
 
 **Hex**
+
+```
+18b0d4bdd80d910048ea032d0b30a94dc24bcf49e6953cf47ddabaeeed565d3b
+```
 
 Like Decimal, simply interprets the byte sequence as a binary number and converts it to hexadecimal.
 
