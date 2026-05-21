@@ -67,24 +67,22 @@ For example, when the total bit length is 256 bits, the timestamp is 64 bits and
 
 The ratio is fixed so that when retrieving the timestamp from an ID, the exact length can be easily determined without needing a separator.
 
-### Formats
+## Formats
 Unlike other methods, FourWord does not strictly require text conversion. It supports multiple formats.
 
-**Text**
-
-```
-32OD9FEO1M8G0I7A0CMGMC599N14NJQ9SQAJPT3TRATETRAMBKTGZZZZ
-```
+### Text
 
 Text conversion uses a variant of Base32 Hex.
 
 As mentioned above, Z is used instead of = as the padding character, but otherwise, it is identical to Base32 Hex.
 
-**Compact Text**
+**Example**
 
 ```
-5r0NHGp8VYQuT2sVX1OZNDXn9XRg3qar5CsaahtCi7f
+32OD9FEO1M8G0I7A0CMGMC599N14NJQ9SQAJPT3TRATETRAMBKTGZZZZ
 ```
+
+### Compact Text
 
 Uses Base62 (`0-9A-Za-z`) as the character set.
 The byte sequence is interpreted as a big-endian arbitrary-precision integer and converted to Base62.
@@ -96,11 +94,13 @@ For example, at 256 bits, the Text format is 56 characters while Compact Text fi
 Note that since Base62 is not a power of 2, bitwise operations cannot be used and arbitrary-precision integer arithmetic is required for decoding.
 It also cannot be used in case-insensitive environments.
 
-**Readable Text**
+**Example**
 
 ```
-32od9feo-1m8g0i7a-0cmgmc59-9n14njq9-sqajpt3t-ratetram-bktg
+5r0NHGp8VYQuT2sVX1OZNDXn9XRg3qar5CsaahtCi7f
 ```
+
+### Readable Text
 
 Based on the Text format, with the following modifications for human readability:
 
@@ -108,23 +108,43 @@ Based on the Text format, with the following modifications for human readability
 - Padding is omitted (since bit length is fixed, it can be restored during decoding)
 - A hyphen (`-`) is inserted every 8 characters
 
-**Decimal**
+**Example**
 
 ```
-11167941737807864551984210163608533232246628802352979308802140359026483289403
+32od9feo-1m8g0i7a-0cmgmc59-9n14njq9-sqajpt3t-ratetram-bktg
 ```
 
-Simply interprets the byte sequence as a binary number and converts it to decimal.
+### Decimal
 
-**Hex**
+Interprets the byte sequence as a big-endian unsigned integer, adds `2^N` (where N is the total bit length), and converts to decimal.
+
+```
+Decimal = 2^N + (byte_sequence as big-endian unsigned integer)
+```
+
+The result always has a fixed number of digits for a given bit length, allowing the bit length to be determined from the digit count alone during decoding.
+
+**Decoding**
+
+Determine N from the digit count, then subtract 2^N to recover the original byte sequence.
+
+**Example**
+
+```
+126960030975124059975555195172296441085516613467993543348259724366939612929339
+```
+
+### Hex
+
+Simply interprets the byte sequence as a binary number and converts it to hexadecimal.
+
+**Example**
 
 ```
 18b0d4bdd80d910048ea032d0b30a94dc24bcf49e6953cf47ddabaeeed565d3b
 ```
 
-Like Decimal, simply interprets the byte sequence as a binary number and converts it to hexadecimal.
-
-### Collision Probability
+## Collision Probability
 IDs with different timestamps do not collide. The values below represent the worst-case scenario (all IDs generated within the same nanosecond).
 
 | Bits | Random bit width | IDs for 10⁻¹⁸ collision prob. | IDs for 10⁻⁹ collision prob. | IDs for 50% collision prob. |
@@ -138,7 +158,7 @@ IDs with different timestamps do not collide. The values below represent the wor
 | 1792 | 1344 bit | approx 2.77 × 10¹⁹³ | approx 8.76 × 10¹⁹⁷ | approx 2.31 × 10²⁰² |
 | 2048 | 1536 bit | approx 2.20 × 10²²² | approx 6.94 × 10²²⁶ | approx 1.83 × 10²³¹ |
 
-### Overflow Timing
+## Overflow Timing
 Each bit length will overflow at the following times:
 
 | Bits | Timestamp bit width | Max seconds | Overflow timing (approx) |

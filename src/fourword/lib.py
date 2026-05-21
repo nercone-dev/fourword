@@ -77,18 +77,10 @@ class FourWord:
     @staticmethod
     def from_decimal(value: int | str, bits: int | None = None) -> "FourWord":
         n = int(value)
-        if bits is not None:
-            return FourWord(n.to_bytes(bits // 8, 'big'))
-        min_bytes = max((n.bit_length() + 7) // 8, 1)
-        byte_len = ((min_bytes + 3) // 4) * 4
-        while byte_len <= 65536 // 8:
-            ts_ns = n >> (byte_len * 6)
-            try:
-                datetime.fromtimestamp(ts_ns / 1_000_000_000, tz=timezone.utc)
-                return FourWord(n.to_bytes(byte_len, 'big'))
-            except (OSError, OverflowError, ValueError):
-                byte_len += 4
-        raise ValueError("Cannot determine bit length from decimal representation. Specify it explicitly with FourWord like: from_decimal(value, bits=N)")
+        if bits is None:
+            bits = n.bit_length() - 1
+        raw = n - (1 << bits)
+        return FourWord(raw.to_bytes(bits // 8, 'big'))
 
     @staticmethod
     def from_hex(text: str) -> "FourWord":
@@ -122,6 +114,10 @@ class FourWord:
         return timestamp + random
 
     @property
+    def bits(self) -> int:
+        return len(self.bytes) * 8
+
+    @property
     def timestamp(self) -> datetime:
         ts_byte_len = len(self.bytes) // 4
         time_ns = int.from_bytes(self.bytes[:ts_byte_len], byteorder='big')
@@ -148,7 +144,7 @@ class FourWord:
     @property
     def compact_text(self) -> str:
         chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-        n = self.int
+        n = self.decimal
         length = math.ceil(len(self.bytes) * 8 * (math.log(2) / math.log(62)))
         result = []
         while n:
@@ -165,7 +161,8 @@ class FourWord:
 
     @property
     def decimal(self) -> int:
-        return int.from_bytes(self.bytes, 'big')
+        n = len(self.bytes) * 8
+        return (1 << n) + int.from_bytes(self.bytes, 'big')
 
     @property
     def hex(self) -> str:
