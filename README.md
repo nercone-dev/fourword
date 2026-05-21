@@ -163,14 +163,14 @@ Each bit length will overflow at the following times:
 
 | Bits | Timestamp bit width | Max seconds | Overflow timing (approx) |
 |---:|---:|:---|:---|
-| 256 | 64 bit | approx 1.84 × 10¹⁹ s | approx 584.4 billion years AD (5.845 × 10¹¹ years) |
-| 512 | 128 bit | approx 3.40 × 10³⁸ s | approx 1.07 × 10³¹ years later |
-| 768 | 192 bit | approx 6.28 × 10⁵⁷ s | approx 1.99 × 10⁵⁰ years later |
-| 1024 | 256 bit | approx 1.16 × 10⁷⁷ s | approx 3.67 × 10⁶⁹ years later |
-| 1280 | 320 bit | approx 2.14 × 10⁹⁶ s | approx 6.77 × 10⁸⁸ years later |
-| 1536 | 384 bit | approx 3.94 × 10¹¹⁵ s | approx 1.25 × 10¹⁰⁸ years later |
-| 1792 | 448 bit | approx 7.26 × 10¹³⁴ s | approx 2.30 × 10¹²⁷ years later |
-| 2048 | 512 bit | approx 1.34 × 10¹⁵⁴ s | approx 4.24 × 10¹⁴⁶ years later |
+| 256 | 64 bit | approx 1.84 × 10¹⁰ s | approx 2554 years |
+| 512 | 128 bit | approx 3.40 × 10²⁹ s | approx 1.08 × 10²² years later |
+| 768 | 192 bit | approx 6.28 × 10⁴⁸ s | approx 1.99 × 10⁴¹ years later |
+| 1024 | 256 bit | approx 1.16 × 10⁶⁸ s | approx 3.67 × 10⁶⁰ years later |
+| 1280 | 320 bit | approx 2.14 × 10⁸⁷ s | approx 6.77 × 10⁷⁹ years later |
+| 1536 | 384 bit | approx 3.94 × 10¹⁰⁶ s | approx 1.25 × 10⁹⁹ years later |
+| 1792 | 448 bit | approx 7.27 × 10¹²⁵ s | approx 2.30 × 10¹¹⁸ years later |
+| 2048 | 512 bit | approx 1.34 × 10¹⁴⁵ s | approx 4.25 × 10¹³⁷ years later |
 
 ## License
 The source code and library within this repository are free to use under the MIT License.
