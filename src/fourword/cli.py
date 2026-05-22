@@ -26,65 +26,49 @@ def print_fourword(fw: FourWord, detail: bool = False) -> None:
     else:
         print(fw.text)
 
-def is_bit_size(s: str) -> bool:
-    try:
-        n = int(s)
-        return n % 32 == 0 and 32 <= n <= 65536
-    except ValueError:
-        return False
-
 def cmd_generate(args):
     dt = parse_iso8601(args.timestamp) if args.timestamp else None
     for i in range(args.nums):
-        if i > 0 and args.detail:
-            print()
         try:
             fw = FourWord(args.bits, dt)
         except OverflowError as e:
             print(f"Error: {e}", file=sys.stderr)
             sys.exit(1)
         print_fourword(fw, args.detail)
+        if args.detail and i < args.nums - 1:
+            print()
 
 def cmd_info(args):
-    for i, id_str in enumerate(args.id):
-        if i > 0:
-            print()
+    for i, id in enumerate(args.id):
         try:
-            fw = FourWord(id_str)
+            fw = FourWord(id)
         except Exception as e:
-            print(f"Error: Failed to parse FourWord '{id_str}': {e}", file=sys.stderr)
+            print(f"Error: Failed to parse FourWord '{id}': {e}", file=sys.stderr)
             sys.exit(1)
         print_fourword(fw, detail=True)
+        if i < len(args.id) - 1:
+            print()
 
 def cmd_default(args):
     values = args.values or []
-    to_decode = [v for v in values if not is_bit_size(v)]
-    to_generate = [int(v) for v in values if is_bit_size(v)]
-
     dt = parse_iso8601(args.timestamp) if args.timestamp else None
-
-    if not to_generate and not to_decode:
-        to_generate = [FourWord.min_bits(dt)]
-
-    for bits in to_generate:
-        for i in range(args.nums):
+    for i, value in enumerate(values):
+        if value.isdigit() and int(value) % 32 == 0 and 32 <= int(value) <= 65536:
             try:
-                fw = FourWord(bits, dt)
+                fw = FourWord(int(value), dt)
             except OverflowError as e:
                 print(f"Error: {e}", file=sys.stderr)
                 sys.exit(1)
-            print_fourword(fw, args.detail)
-            if args.detail and i < (args.nums - 1):
-                print()
-
-    for i in range(len(to_decode)):
-        try:
-            fw = FourWord(to_decode[i])
-        except Exception as e:
-            print(f"Error: Failed to parse FourWord '{to_decode[i]}': {e}", file=sys.stderr)
-            sys.exit(1)
-        print_fourword(fw, detail=True)
-        if args.detail and i < (args.nums - 1):
+            detail = args.detail
+        else:
+            try:
+                fw = FourWord(value, dt)
+            except Exception as e:
+                print(f"Error: Failed to parse FourWord '{value}': {e}", file=sys.stderr)
+                sys.exit(1)
+            detail = True
+        print_fourword(fw, detail)
+        if detail and i < len(values) - 1:
             print()
 
 def main():
