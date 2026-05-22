@@ -4,8 +4,10 @@ import warnings
 from datetime import datetime, timezone
 
 class FourWord:
-    def __init__(self, arg: str | bytes | int = 256, dt: datetime | None = None):
-        if isinstance(arg, str):
+    def __init__(self, arg: str | bytes | int | None = None, dt: datetime | None = None):
+        if arg is None:
+            self.bytes = self.generate(dt=dt)
+        elif isinstance(arg, str):
             detected_format = FourWord.detect_format(arg)
             if detected_format == 'readable':
                 self.bytes = FourWord.from_readable_text(arg).bytes
@@ -66,7 +68,7 @@ class FourWord:
         n = 0
         for c in text:
             n = n * 62 + chars.index(c)
-        return FourWord(n.to_bytes(byte_len, 'big'))
+        return FourWord.from_decimal(n, bits)
 
     @staticmethod
     def from_readable_text(text: str) -> "FourWord":
@@ -87,7 +89,27 @@ class FourWord:
         raw = bytes.fromhex(text)
         return FourWord(raw)
 
-    def generate(self, bits: int = 256, dt: datetime | None = None) -> bytes:
+    @staticmethod
+    def min_bits(dt: datetime | None = None) -> int:
+        if dt is not None:
+            if dt.tzinfo is not None:
+                dt_utc = dt
+            else:
+                dt_utc = dt.replace(tzinfo=timezone.utc)
+        else:
+            dt_utc = datetime.now(timezone.utc)
+
+        time_ns = int(dt_utc.timestamp() * 1_000_000_000)
+        return ((time_ns.bit_length() + 7) // 8) * 32
+
+    def generate(self, bits: int | None = None, dt: datetime | None = None) -> bytes:
+        if bits is None:
+            bits = FourWord.min_bits(dt)
+
+        min_bits = FourWord.min_bits(dt)
+        if bits < min_bits:
+            raise OverflowError(f"bits must be >= {min_bits} (timestamp requires {min_bits // 4}-bit minimum)")
+
         if bits % 32 != 0:
             warnings.warn("The number of bits is not divisible by 32. The actual generated length may not match the number of bits.", UserWarning, stacklevel=2)
 
@@ -104,18 +126,22 @@ class FourWord:
         bits_timestamp = bits // 4
         bits_csprng = (bits // 4) * 3
 
-        try:
-            timestamp = time_ns.to_bytes(bits_timestamp // 8, byteorder='big')
-        except OverflowError:
-            bits_needed = ((time_ns.bit_length() + 7) // 8) * 32
-            raise OverflowError(f"bits must be >= {bits_needed} (timestamp requires {time_ns.bit_length()}-bit minimum)")
+        timestamp = time_ns.to_bytes(bits_timestamp // 8, byteorder='big')
+        csprng = secrets.token_bytes(int(bits_csprng / 8))
 
-        random = secrets.token_bytes(int(bits_csprng / 8))
-        return timestamp + random
+        return timestamp + csprng
 
     @property
     def bits(self) -> int:
         return len(self.bytes) * 8
+
+    @property
+    def bits_timestamp(self) -> int:
+        return self.bits // 4
+
+    @property
+    def bits_csprng(self) -> int:
+        return (self.bits // 4) * 3
 
     @property
     def timestamp(self) -> datetime:
@@ -144,7 +170,7 @@ class FourWord:
     @property
     def compact_text(self) -> str:
         chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-        n = self.decimal
+        n = int.from_bytes(self.bytes, 'big')
         length = math.ceil(len(self.bytes) * 8 * (math.log(2) / math.log(62)))
         result = []
         while n:
