@@ -68,7 +68,7 @@ class FourWord:
         n = 0
         for c in text:
             n = n * 62 + chars.index(c)
-        return FourWord.from_decimal(n, bits)
+        return FourWord(n.to_bytes(byte_len, 'big'))
 
     @staticmethod
     def from_readable_text(text: str) -> "FourWord":
