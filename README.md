@@ -32,7 +32,7 @@ uv add fourword
 ```
 
 ```python
-from fourword.lib import FourWord
+from fourword import FourWord
 
 fourword = FourWord(bits=256)
 print(fourword.text)

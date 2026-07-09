@@ -1,10 +1,11 @@
 import math
 import secrets
 import warnings
+from typing import Optional, Union
 from datetime import datetime, timezone
 
 class FourWord:
-    def __init__(self, arg: str | bytes | int | None = None, dt: datetime | None = None):
+    def __init__(self, arg: Optional[Union[str, bytes, int]] = None, dt: Optional[datetime] = None):
         if arg is None:
             self.bytes = self.generate(dt=dt)
         elif isinstance(arg, str):
@@ -77,7 +78,7 @@ class FourWord:
         return FourWord.from_text(clean + 'Z' * pad)
 
     @staticmethod
-    def from_decimal(value: int | str, bits: int | None = None) -> "FourWord":
+    def from_decimal(value: Union[int, str], bits: Optional[int] = None) -> "FourWord":
         n = int(value)
         if bits is None:
             bits = n.bit_length() - 1
@@ -90,7 +91,7 @@ class FourWord:
         return FourWord(raw)
 
     @staticmethod
-    def min_bits(dt: datetime | None = None) -> int:
+    def min_bits(dt: Optional[datetime] = None) -> int:
         if dt is not None:
             if dt.tzinfo is not None:
                 dt_utc = dt
@@ -102,7 +103,7 @@ class FourWord:
         time_ns = int(dt_utc.timestamp() * 1_000_000_000)
         return ((time_ns.bit_length() + 7) // 8) * 32
 
-    def generate(self, bits: int | None = None, dt: datetime | None = None) -> bytes:
+    def generate(self, bits: Optional[int] = None, dt: Optional[datetime] = None) -> bytes:
         if bits is None:
             bits = FourWord.min_bits(dt)
 
